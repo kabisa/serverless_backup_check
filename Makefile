@@ -2,5 +2,8 @@
 test:
 	./tests/test.sh
 
-.PHONY: test
+ci:
+	docker build . --tag backup && docker run -t backup
+
+.PHONY: test ci
 
