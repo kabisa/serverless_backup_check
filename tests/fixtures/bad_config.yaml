@@ -1,0 +1,6 @@
+# https://s3.console.aws.amazon.com/s3/buckets/kabisa-backup/?region=eu-west-1&tab=overview#
+s3_bucket_name: 'my_test_bucket'
+backup_folders:
+    - 'a'
+    - 'b'
+    - 'c'
