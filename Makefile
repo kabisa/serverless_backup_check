@@ -1,9 +1,13 @@
 
 test:
-	./tests/test.sh
+	@./tests/test.sh
 
 ci:
-	docker build . --tag backup && docker run -t backup
+	@docker build . --tag backup && docker run -t backup
 
-.PHONY: test ci
+clean:
+	@find . -type d | grep "pycache" | xargs rm -r
+	@rm -rf htmlcov
+
+.PHONY: test ci clean
 
