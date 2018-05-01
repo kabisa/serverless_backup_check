@@ -8,5 +8,3 @@ htmlcov
 # Pytest related files:
 .pytest_cache
 
-# Config files used to test locally:
-config.yaml

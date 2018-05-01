@@ -1,6 +1,0 @@
-s3_bucket_name: 'my_test_bucket'
-email_address: 'test@example.com'
-backup_folders:
-    - 'a'
-    - 'b'
-    - 'c'
