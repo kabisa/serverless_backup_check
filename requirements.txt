@@ -1,2 +1,3 @@
 pyyaml == 3.12
 humanize == 0.5.1
+boto3 == 1.7.10
