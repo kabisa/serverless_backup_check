@@ -1,3 +1,3 @@
 #!/bin/sh
 
-pytest -n auto --cov .
+pytest -n auto --cov=backup --cov-report html .
