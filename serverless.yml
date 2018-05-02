@@ -1,0 +1,46 @@
+service: serverless-backup-analysis
+provider:
+  name: aws
+  runtime: python3.6
+  region: eu-west-1
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "s3:ListBucket"
+        - "s3:ListBucketVersions"
+        - "s3:GetObjectAcl"
+        - "s3:GetObjectVersionAcl"
+        - "s3:ListBucketMultipartUploads"
+        - "s3:ListMultipartUploadParts"
+        - "s3:GetObject"
+        - "s3:GetBucketCORS"
+        - "s3:GetBucketLocation"
+        - "s3:GetObjectVersion"
+      Resource:
+        - "arn:aws:s3:::${env:BUCKET_NAME}"
+        - "arn:aws:s3:::${env:BUCKET_NAME}/*"
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
+
+package:
+  include:
+    - requirements.txt
+    - backup/**
+  exclude:
+    - tests/**
+    - requirements_test.txt
+    - requirements_dev.txt
+
+functions:
+  backup-analysis:
+    handler: backup.main.handler
+    events:
+      - http:
+          path: /
+          method: post
+          cors: true

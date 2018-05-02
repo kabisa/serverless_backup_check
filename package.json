@@ -1,0 +1,17 @@
+{
+  "name": "serverless_backup_analysis",
+  "version": "1.0.0",
+  "description": "This repo contains code for posting a mail summary each week about backups, made in a specific S3 bucket. It uses the serverless framework + Lambda in order to do this.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "serverless-python-requirements": "^4.0.2"
+  }
+}

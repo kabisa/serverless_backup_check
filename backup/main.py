@@ -17,7 +17,7 @@ def response_error(error):
     }
 
 
-def main(event, context):
+def handler(event, context):
     logger.info('Received request to do backup check...')
     body = event['body']
     bucket_name = body.get('bucket_name')

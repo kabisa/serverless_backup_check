@@ -8,3 +8,9 @@ htmlcov
 # Pytest related files:
 .pytest_cache
 
+# Serverless related files:
+.serverless/
+node_modules/
+
+# Config related files:
+environment.sh

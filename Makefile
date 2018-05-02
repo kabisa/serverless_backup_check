@@ -9,5 +9,8 @@ clean:
 	@find . -type d | grep "pycache" | xargs rm -r
 	@rm -rf htmlcov
 
-.PHONY: test ci clean
+deploy:
+	./deploy.sh
+
+.PHONY: test ci clean deploy
 
