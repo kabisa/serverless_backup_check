@@ -1,39 +1,42 @@
 #!/usr/bin/env python3
 
-
-import os
-import sys
 import logging
-import mail
+from backup.s3_client import S3Client
+from backup.server_stats import ServerStats
+
 
 logger = logging.getLogger(__name__)
 
 
-def do_backup_check(bucket_name, folders):
-    pass
+def response_error(error):
+    'Helper function to return an error response.'
+    logger.error(error)
+    return {
+        'statusCode': 400,
+        'body': error
+    }
 
 
-def main():
-    backup_folders = os.environ.get('BACKUP_FOLDERS')
-    bucket_name = os.environ.get('S3_BUCKET_NAME')
-    email = os.environ.get('EMAIL_ADDRESS')
+def main(event, context):
+    logger.info('Received request to do backup check...')
+    body = event['body']
+    bucket_name = body.get('bucket_name')
+    backup_folder = body.get('backup_folder')
 
-    for env_var, var in [('BACKUP_FOLDERS', backup_folders),
-                         ('S3_BUCKET_NAME', bucket_name),
-                         ('EMAIL_ADDRESS', email)]:
-        if not var:
-            logger.error(f'Missing `{env_var}` environment variable, aborting.')
-            sys.exit(1)
+    if not bucket_name:
+        return response_error(f'Missing `bucket_name` variable in POST body, aborting.')
+    if not backup_folder:
+        return response_error(f'Missing `backup_folder` variable in POST body, aborting.')
 
-    logger.info('Performing backup check...')
-    backup_summary = do_backup_check(bucket_name, backup_folders)
+    logger.info(f'Performing backup check, folder: {backup_folder}...')
+    s3 = S3Client(bucket_name)
+    backup_stats = ServerStats(s3, backup_folder)
 
-    logger.info('Finished backup check! Sending out mail summary...')
-    mail.send_backup_summary(backup_summary)
+    response_body = backup_stats.json
+    response = {
+        'statusCode': 200,
+        'body': response_body
+    }
 
-    logger.info('Done!')
-    sys.exit(0)
-
-
-if __name__ == '__main__':
-    main()
+    logger.info(f'Sending back response: {response}.')
+    return response
