@@ -1,4 +1,5 @@
 
+import json
 import humanize
 from backup.s3_client import BackupStatus
 
@@ -20,30 +21,37 @@ def format_backup_size(backup_size):
 
 class ServerStats(object):
 
-    def __init__(self, s3_client, server_name, folder):
-        self.server_name = server_name
-        self.last_size = 0
-        self.second_last_size = 0
+    def __init__(self, s3_client, folder):
+        self.backup_folder = folder
+        self.last_size, self.second_last_size = 0, 0
         self.is_within_tolerance = False
 
-        status, backup_folders = s3_client.get_last_backup_folders(folder)
-        if status == BackupStatus.NO_PREVIOUS_BACKUP:
+        self.status, backup_folders = s3_client.get_last_backup_folders(folder)
+        if self.status == BackupStatus.NO_PREVIOUS_BACKUP:
             self.last_size = s3_client.get_backup_size(backup_folders[0])
-            self.is_within_tolerance = True
-        elif status == BackupStatus.NO_CURRENT_BACKUP:
+        elif self.status == BackupStatus.NO_CURRENT_BACKUP:
             self.second_last_size = s3_client.get_backup_size(backup_folders[1])
-            self.is_within_tolerance = False
         else:  # OK
             self.last_size = s3_client.get_backup_size(backup_folders[0])
             self.second_last_size = s3_client.get_backup_size(backup_folders[1])
             self.is_within_tolerance = within_tolerance(self.last_size, self.second_last_size)
 
     @property
-    def report(self):
-        'Generates a one-line report of the server status.'
-        # TODO use html for formatting into table?
-        health_status = 'Yes' if self.is_within_tolerance else 'No'
-        last_size = format_backup_size(self.last_size)
-        second_last_size = format_backup_size(self.second_last_size)
-        return f'- Server: {self.server_name}, healthy: {health_status}, ' \
-            + f'last backup size: {last_size}, 2nd last backup size: {second_last_size}.'
+    def json(self):
+        'Returns status of the server as a JSON string.'
+        if self.status == BackupStatus.OK:
+            if self.is_within_tolerance:
+                status = "Backup OK."
+            else:
+                status = f'Backup size is outside tolerance, now: {self.last_size}, '\
+                         f'previous: {self.second_last_size}'
+        else:
+            status = self.status.value
+
+        info = {
+            'backup_folder': self.backup_folder,
+            'backup_status': status,
+            'last_backup_size': self.last_size,
+            'previous_backup_size': self.second_last_size,
+        }
+        return json.dumps(info)

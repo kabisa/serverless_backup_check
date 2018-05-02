@@ -1,7 +1,19 @@
 
+import pytest
+import json
 import unittest.mock as mock
 from backup.s3_client import BackupStatus
 from backup.server_stats import ServerStats, within_tolerance, format_backup_size
+
+
+@pytest.fixture
+def folder():
+    return 'a/b/c'
+
+
+@pytest.fixture
+def dirs():
+    return ['dir1', 'dir2']
 
 
 def test_within_tolerance():
@@ -26,57 +38,77 @@ def test_format_backup_size():
     assert format_backup_size((2 ** 30) * 1.1) == '1.1 GiB'
 
 
-def test_server_report_generation_missing_previous_backup():
+def test_server_json_generation_missing_previous_backup(folder, dirs):
     expected_size1 = 2 ** 30
+    expected_json = json.dumps({
+        "backup_folder": folder,
+        "backup_status": "Missing previous backup",
+        "last_backup_size": expected_size1,
+        "previous_backup_size": 0
+    })
     mock_client = mock.Mock()
     mock_client.get_backup_size.return_value = expected_size1
-    mock_client.get_last_backup_folders.return_value = BackupStatus.NO_PREVIOUS_BACKUP, ['dir1', 'dir2']
-    stats = ServerStats(mock_client, 'my_test_server', 'a/b/c')
+    mock_client.get_last_backup_folders.return_value = BackupStatus.NO_PREVIOUS_BACKUP, dirs
+    stats = ServerStats(mock_client, folder)
 
-    assert stats.server_name == 'my_test_server'
     assert stats.last_size == expected_size1
     assert stats.second_last_size == 0
-    assert stats.is_within_tolerance
-    assert stats.report == '- Server: my_test_server, healthy: Yes, last backup size: 1.0 GiB, 2nd last backup size: 0 Bytes.'
+    assert not stats.is_within_tolerance
+    assert stats.json == expected_json
 
 
-def test_server_report_generation_missing_current_backup():
+def test_server_json_generation_missing_current_backup(folder, dirs):
     expected_size2 = 2 ** 20
+    expected_json = json.dumps({
+        "backup_folder": folder,
+        "backup_status": 'Missing current backup',
+        "last_backup_size": 0,
+        "previous_backup_size": expected_size2
+    })
     mock_client = mock.Mock()
     mock_client.get_backup_size.return_value = expected_size2
-    mock_client.get_last_backup_folders.return_value = BackupStatus.NO_CURRENT_BACKUP, ['dir1', 'dir2']
-    stats = ServerStats(mock_client, 'my_test_server', 'a/b/c')
+    mock_client.get_last_backup_folders.return_value = BackupStatus.NO_CURRENT_BACKUP, dirs
+    stats = ServerStats(mock_client, folder)
 
-    assert stats.server_name == 'my_test_server'
     assert stats.last_size == 0
     assert stats.second_last_size == expected_size2
     assert not stats.is_within_tolerance
-    assert stats.report == '- Server: my_test_server, healthy: No, last backup size: 0 Bytes, 2nd last backup size: 1.0 MiB.'
+    assert stats.json == expected_json
 
 
-def test_server_report_generation_outside_tolerance():
-    expected_size1, expected_size2 = 2 ** 20, 2 ** 30  # 1 MB
+def test_server_json_generation_outside_tolerance(folder, dirs):
+    expected_size1, expected_size2 = 2 ** 20, 2 ** 30
+    expected_json = json.dumps({
+        "backup_folder": folder,
+        "backup_status": f"Backup size is outside tolerance, now: {expected_size1}, previous: {expected_size2}",
+        "last_backup_size": expected_size1,
+        "previous_backup_size": expected_size2
+    })
     mock_client = mock.Mock()
     mock_client.get_backup_size.side_effect = [expected_size1, expected_size2]
-    mock_client.get_last_backup_folders.return_value = BackupStatus.OK, ['dir1', 'dir2']
-    stats = ServerStats(mock_client, 'my_test_server', 'a/b/c')
+    mock_client.get_last_backup_folders.return_value = BackupStatus.OK, dirs
+    stats = ServerStats(mock_client, folder)
 
-    assert stats.server_name == 'my_test_server'
     assert stats.last_size == expected_size1
     assert stats.second_last_size == expected_size2
     assert not stats.is_within_tolerance
-    assert stats.report == '- Server: my_test_server, healthy: No, last backup size: 1.0 MiB, 2nd last backup size: 1.0 GiB.'
+    assert stats.json == expected_json
 
 
-def test_server_report_generation_happy_path():
+def test_server_json_generation_happy_path(folder, dirs):
     expected_size = 2 ** 20  # 1 MB
+    expected_json = json.dumps({
+        "backup_folder": folder,
+        "backup_status": "Backup OK.",
+        "last_backup_size": expected_size,
+        "previous_backup_size": expected_size
+    })
     mock_client = mock.Mock()
     mock_client.get_backup_size.return_value = expected_size
-    mock_client.get_last_backup_folders.return_value = BackupStatus.OK, ['dir1', 'dir2']
-    stats = ServerStats(mock_client, 'my_test_server', 'a/b/c')
+    mock_client.get_last_backup_folders.return_value = BackupStatus.OK, dirs
+    stats = ServerStats(mock_client, folder)
 
-    assert stats.server_name == 'my_test_server'
     assert stats.last_size == expected_size
     assert stats.second_last_size == expected_size
     assert stats.is_within_tolerance
-    assert stats.report == '- Server: my_test_server, healthy: Yes, last backup size: 1.0 MiB, 2nd last backup size: 1.0 MiB.'
+    assert stats.json == expected_json
