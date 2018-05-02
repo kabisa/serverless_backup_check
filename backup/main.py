@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import json
 import logging
 from backup.s3_client import S3Client
 from backup.server_stats import ServerStats
@@ -19,7 +20,7 @@ def response_error(error):
 
 def handler(event, context):
     logger.info('Received request to do backup check...')
-    body = event['body']
+    body = json.loads(event['body'])
     bucket_name = body.get('bucket_name')
     backup_folder = body.get('backup_folder')
 
