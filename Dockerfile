@@ -10,5 +10,5 @@ RUN pip install -r requirements_test.txt
 
 COPY backup backup
 COPY tests tests
-RUN flake8 .
+RUN flake8 backup
 ENTRYPOINT ./tests/test.sh
