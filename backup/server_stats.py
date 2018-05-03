@@ -65,7 +65,7 @@ class ServerStats(object):
         info = {
             'backup_folder': self.backup_folder,
             'backup_status': self.status,
-            'last_backup_size': self.last_size,
-            'previous_backup_size': self.second_last_size,
+            'last_backup_size': format_backup_size(self.last_size),
+            'previous_backup_size': format_backup_size(self.second_last_size),
         }
         return json.dumps(info)
