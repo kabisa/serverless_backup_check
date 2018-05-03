@@ -31,10 +31,11 @@ def get_backup_prefix_keys(prefix):
     Returns tuple containing (backup_today_prefix, backup_yesterday_prefix).
     '''
     today = datetime.datetime.today()
-    yesterday = today - datetime.timedelta(days=1)
-    backup_today_prefix = date_to_prefix(prefix, today)
-    backup_yesterday_prefix = date_to_prefix(prefix, yesterday)
-    return backup_today_prefix, backup_yesterday_prefix
+    one_day_ago = today - datetime.timedelta(days=1)
+    two_days_ago = today - datetime.timedelta(days=2)
+    backup_one_day_prefix = date_to_prefix(prefix, one_day_ago)
+    backup_two_days_prefix = date_to_prefix(prefix, two_days_ago)
+    return backup_one_day_prefix, backup_two_days_prefix
 
 
 class ServerStats(object):

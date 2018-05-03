@@ -59,8 +59,9 @@ def test_date_to_prefix(prefix_long):
 
 def test_get_backup_prefix_keys(bucket_name, prefix_long, mock_obj_key_iterator):
     today = datetime.datetime.today()
-    yesterday = today - datetime.timedelta(days=1)
-    key1, key2 = today, yesterday
+    one_day_ago = today - datetime.timedelta(days=1)
+    two_days_ago = today - datetime.timedelta(days=2)
+    key1, key2 = one_day_ago, two_days_ago
     full_path1, full_path2 = date_to_prefix(prefix_long, key1), date_to_prefix(prefix_long, key2)
     mock_obj_key_iterator.return_value = [full_path1, full_path2]
     assert get_backup_prefix_keys(prefix_long) == (full_path1, full_path2)
