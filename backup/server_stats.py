@@ -48,16 +48,15 @@ class ServerStats(object):
     @property
     def status(self):
         if self.last_size == 0 and self.second_last_size == 0:
-            return 'Missing current and previous backup.'
+            return 'Missing current and previous backup'
         elif self.second_last_size == 0:
-            return 'Missing previous backup.'
+            return 'Missing previous backup'
         elif self.last_size == 0:
-            return 'Missing current backup.'
+            return 'Missing current backup'
         elif not within_tolerance(self.last_size, self.second_last_size):
-            return f'Backup size is outside tolerance, now: {self.last_size}, '\
-                   f'previous: {self.second_last_size}.'
+            return f'Backup size is outside tolerance'
 
-        return 'Backup OK.'
+        return 'Backup OK'
 
     @property
     def json(self):

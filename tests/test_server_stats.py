@@ -84,7 +84,7 @@ def test_server_json_generation_missing_previous_backup(folder, dirs):
     expected_size1 = 2 ** 30
     expected_json = json.dumps({
         "backup_folder": folder,
-        "backup_status": "Missing previous backup.",
+        "backup_status": "Missing previous backup",
         "last_backup_size": expected_size1,
         "previous_backup_size": 0
     })
@@ -101,7 +101,7 @@ def test_server_json_generation_missing_current_backup(folder, dirs):
     expected_size2 = 2 ** 20
     expected_json = json.dumps({
         "backup_folder": folder,
-        "backup_status": 'Missing current backup.',
+        "backup_status": 'Missing current backup',
         "last_backup_size": 0,
         "previous_backup_size": expected_size2
     })
@@ -118,7 +118,7 @@ def test_server_json_generation_outside_tolerance(folder, dirs):
     expected_size1, expected_size2 = 2 ** 20, 2 ** 30
     expected_json = json.dumps({
         "backup_folder": folder,
-        "backup_status": f"Backup size is outside tolerance, now: {expected_size1}, previous: {expected_size2}.",
+        "backup_status": f"Backup size is outside tolerance",
         "last_backup_size": expected_size1,
         "previous_backup_size": expected_size2
     })
@@ -135,7 +135,7 @@ def test_server_json_generation_happy_path(folder, dirs):
     expected_size = 2 ** 20  # 1 MB
     expected_json = json.dumps({
         "backup_folder": folder,
-        "backup_status": "Backup OK.",
+        "backup_status": "Backup OK",
         "last_backup_size": expected_size,
         "previous_backup_size": expected_size
     })
