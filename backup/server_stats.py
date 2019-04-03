@@ -68,6 +68,8 @@ class ServerStats(object):
             'backup_folder': self.backup_folder,
             'backup_status': self.status,
             'last_backup_size': format_backup_size(self.last_size),
+            'last_backup_date': (date.today() - timedelta(1)).strftime('%Y-%m-%d'),
             'previous_backup_size': format_backup_size(self.second_last_size),
+            'previous_backup_date': (date.today() - timedelta(2)).strftime('%Y-%m-%d'),
         }
         return json.dumps(info)
