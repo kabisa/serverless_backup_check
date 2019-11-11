@@ -36,10 +36,8 @@ def allowed_size_change(bytesize):
     order_of_magnitude = math.log10(bytesize)
 
     minimum_percentage = 2
-    maximum_percentage = (
-        math.exp(
-            dec - math.sqrt(a * math.pow(order_of_magnitude, 2) + inc) / div
-        ) * n
-    )
+    maximum_percentage = math.exp(
+        dec - math.sqrt(a * math.pow(order_of_magnitude, 2) + inc) / div
+    ) * n
 
     return int(max(minimum_percentage, maximum_percentage))
