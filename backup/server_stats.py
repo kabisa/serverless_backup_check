@@ -1,12 +1,12 @@
-
 import json
 import datetime
 import humanize
+from backup.size_change_monitor import relative_size_change, allowed_size_change
 
 
 def within_tolerance(current, previous):
-    'Checks if the backup size is within tolerance compared to last time (+- 10%).'
-    return current <= previous * 1.1 and current >= previous * 0.9
+    'Checks if the backup size grew less than the allowd size'
+    return relative_size_change(current, previous) <= allowed_size_change(previous)
 
 
 def date_to_prefix(prefix, date):
