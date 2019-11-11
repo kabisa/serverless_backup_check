@@ -36,7 +36,7 @@ def allowed_size_change(bytesize):
 
     allowed_percentage = (
         math.exp(
-            dec - math.sqrt(a * math.pow(order_of_magnitude, 2) + inc)/div
+            dec - math.sqrt(a * math.pow(order_of_magnitude, 2) + inc) / div
         ) * n
     )
 
