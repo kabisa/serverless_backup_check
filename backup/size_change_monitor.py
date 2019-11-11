@@ -2,7 +2,7 @@ import math
 
 
 def relative_size_change(current, previous):
-    return int(abs(((current - previous)/previous) * 100))
+    return int(abs(((current - previous) / previous) * 100))
 
 
 def allowed_size_change(bytesize):
