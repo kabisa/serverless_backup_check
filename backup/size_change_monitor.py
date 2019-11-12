@@ -2,7 +2,11 @@ import math
 
 
 def relative_size_change(current, previous):
-    return int(abs(((current - previous)/previous) * 100))
+    '''
+    Return the percentage that the file size changed. The returned value is 
+    absolute (negative or positive change both returns a positive percentage).
+    '''
+    return int(abs(((current - previous) / previous) * 100))
 
 
 def allowed_size_change(bytesize):
@@ -30,17 +34,11 @@ def allowed_size_change(bytesize):
     inc = 2.5
     dec = 2
 
-    # The minimum percentage to allow
-    minimum_percentage = 2
-
     order_of_magnitude = math.log10(bytesize)
 
-    allowed_percentage = (
-        math.exp(
-            dec - math.sqrt(a * math.pow(order_of_magnitude, 2) + inc)/div
-        ) * n
-    )
+    minimum_percentage = 2
+    maximum_percentage = math.exp(
+        dec - math.sqrt(a * math.pow(order_of_magnitude, 2) + inc) / div
+    ) * n
 
-    # Return the largest of the 2 percentages. This makes sure that when
-    # allowed_percentages goes below minimum_percentage, minimum is returned
-    return int(max(minimum_percentage, allowed_percentage))
+    return int(max(minimum_percentage, maximum_percentage))

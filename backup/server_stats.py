@@ -5,7 +5,7 @@ from backup.size_change_monitor import relative_size_change, allowed_size_change
 
 
 def within_tolerance(current, previous):
-    'Checks if the backup size grew less than the allowd size'
+    'Checks if the backup size grew less than the allowed size.'
     return relative_size_change(current, previous) <= allowed_size_change(previous)
 
 
