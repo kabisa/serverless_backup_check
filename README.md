@@ -29,3 +29,5 @@ export BUCKET_NAME=XXX
 
 After this is done, you can deploy with the following command: `make deploy`.
 
+Backup size change limitations are based on the calculations in 
+https://drive.google.com/open?id=1tiQXgoRs9gfTeVeEpIu1l0TDDkTfh4dDDm1Eud0zhxQ

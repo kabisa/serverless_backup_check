@@ -17,7 +17,8 @@ def allowed_size_change(bytesize):
     When a 200kB file grows by 200% to 600kB, it's not a big deal; When a 2GB
     file grows to 6GB, it is.
 
-    This function is based on the calculations in docs/backup_check.numbers
+    This function is based on the calculations in
+    https://drive.google.com/open?id=1tiQXgoRs9gfTeVeEpIu1l0TDDkTfh4dDDm1Eud0zhxQ
 
     The curve can be influenced by changing the variables below, you can try
     different combinations in the Numbers spreadsheet.
