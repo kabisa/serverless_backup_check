@@ -1,5 +1,5 @@
 import json
-import datetime
+from datetime import date, timedelta
 import humanize
 from backup.size_change_monitor import relative_size_change, allowed_size_change
 
@@ -30,9 +30,9 @@ def get_backup_prefix_keys(prefix):
     '''Computes the prefixes that should only match a single backup folder in the S3 bucket.
     Returns tuple containing (backup_today_prefix, backup_yesterday_prefix).
     '''
-    today = datetime.datetime.today()
-    one_day_ago = today - datetime.timedelta(days=1)
-    two_days_ago = today - datetime.timedelta(days=2)
+    today = date.today()
+    one_day_ago = today - timedelta(1)
+    two_days_ago = today - timedelta(2)
     backup_one_day_prefix = date_to_prefix(prefix, one_day_ago)
     backup_two_days_prefix = date_to_prefix(prefix, two_days_ago)
     return backup_one_day_prefix, backup_two_days_prefix
@@ -48,12 +48,14 @@ class ServerStats(object):
 
     @property
     def status(self):
+        one_day_ago = (date.today() - timedelta(1)).strftime('%Y-%m-%d')
+        two_days_ago = (date.today() - timedelta(2)).strftime('%Y-%m-%d')
         if self.last_size == 0 and self.second_last_size == 0:
-            return 'Missing current and previous backup'
+            return f'Missing backup from {one_day_ago} and {two_days_ago}'
         elif self.second_last_size == 0:
-            return 'Missing previous backup'
+            return f'Missing backup from {two_days_ago}'
         elif self.last_size == 0:
-            return 'Missing current backup'
+            return f'Missing backup from {one_day_ago}'
         elif not within_tolerance(self.last_size, self.second_last_size):
             return f'Backup size is outside tolerance'
 
@@ -66,6 +68,8 @@ class ServerStats(object):
             'backup_folder': self.backup_folder,
             'backup_status': self.status,
             'last_backup_size': format_backup_size(self.last_size),
+            'last_backup_date': (date.today() - timedelta(1)).strftime('%Y-%m-%d'),
             'previous_backup_size': format_backup_size(self.second_last_size),
+            'previous_backup_date': (date.today() - timedelta(2)).strftime('%Y-%m-%d'),
         }
         return json.dumps(info)
