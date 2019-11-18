@@ -4,14 +4,14 @@ from backup.size_change_monitor import allowed_size_change, relative_size_change
 
 def test_allowed_size_change_for_small_files():
     """ Returns large percentage for small files """
-    assert allowed_size_change(1) > 10000
-    assert allowed_size_change(100) > 2500
+    assert allowed_size_change(1) == 13406
+    assert allowed_size_change(100) == 3440
 
 
 def test_allowed_size_change_for_large_files():
     """ Return small percentage for large files """
-    assert allowed_size_change(1000000) < 100
-    assert allowed_size_change(1000000000) < 10
+    assert allowed_size_change(1000000) == 69
+    assert allowed_size_change(1000000000) == 3
 
 
 def test_allowed_size_change_minimum_percentage():
