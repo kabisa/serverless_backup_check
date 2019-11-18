@@ -40,14 +40,6 @@ def mock_obj_key_iterator(good_key):
     return s3_client.obj_key_iterator
 
 
-def test_within_tolerance():
-    assert within_tolerance(9, 10)
-    assert within_tolerance(9.5, 10)
-    assert within_tolerance(11, 10)
-    assert not within_tolerance(8.99, 10)
-    assert not within_tolerance(11.01, 10)
-
-
 def test_date_to_prefix(prefix_long):
     jan82017 = datetime.datetime(year=2017, month=1, day=8)
     may12018 = datetime.datetime(year=2018, month=5, day=1)
@@ -86,8 +78,8 @@ def test_server_json_generation_missing_previous_backup(folder, dirs):
     expected_json = json.dumps({
         "backup_folder": folder,
         "backup_status": "Missing previous backup",
-        "last_backup_size": expected_size1,
-        "previous_backup_size": 0
+        "last_backup_size": format_backup_size(expected_size1),
+        "previous_backup_size": format_backup_size(0)
     })
     mock_client = mock.Mock()
     mock_client.get_backup_size.side_effect = [expected_size1, 0]
@@ -103,8 +95,8 @@ def test_server_json_generation_missing_current_backup(folder, dirs):
     expected_json = json.dumps({
         "backup_folder": folder,
         "backup_status": 'Missing current backup',
-        "last_backup_size": 0,
-        "previous_backup_size": expected_size2
+        "last_backup_size": format_backup_size(0),
+        "previous_backup_size": format_backup_size(expected_size2)
     })
     mock_client = mock.Mock()
     mock_client.get_backup_size.side_effect = [0, expected_size2]
@@ -120,8 +112,8 @@ def test_server_json_generation_outside_tolerance(folder, dirs):
     expected_json = json.dumps({
         "backup_folder": folder,
         "backup_status": f"Backup size is outside tolerance",
-        "last_backup_size": expected_size1,
-        "previous_backup_size": expected_size2
+        "last_backup_size": format_backup_size(expected_size1),
+        "previous_backup_size": format_backup_size(expected_size2)
     })
     mock_client = mock.Mock()
     mock_client.get_backup_size.side_effect = [expected_size1, expected_size2]
@@ -137,8 +129,8 @@ def test_server_json_generation_happy_path(folder, dirs):
     expected_json = json.dumps({
         "backup_folder": folder,
         "backup_status": "Backup OK",
-        "last_backup_size": expected_size,
-        "previous_backup_size": expected_size
+        "last_backup_size": format_backup_size(expected_size),
+        "previous_backup_size": format_backup_size(expected_size)
     })
     mock_client = mock.Mock()
     mock_client.get_backup_size.return_value = expected_size
