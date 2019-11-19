@@ -27,6 +27,8 @@ This can be done by providing an environment.sh file in the root directory of th
 export BUCKET_NAME=XXX
 ```
 
+BUCKET_NAME must be the name of the bucket that contains the backups.
+
 After this is done, you can deploy with the following command: `make deploy`.
 
 Backup size change limitations are based on the calculations in 
