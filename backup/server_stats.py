@@ -9,11 +9,14 @@ def within_tolerance(current, previous):
     return relative_size_change(current, previous) <= allowed_size_change(previous)
 
 
-def date_to_prefix(prefix, date):
+def date_to_prefix(prefix, date, file_date_format):
     '''Converts a date to a S3 prefix of the form: prefix/year.month.day.
     Month and day are prepended with a leading zero if it is only 1 letter long.
     '''
-    return '/'.join([prefix, f'{date.year}.{date.month:02}.{date.day:02}'])
+    if file_date_format:
+        return '/'.join([prefix, date.strftime(file_date_format)])
+    else:
+        return '/'.join([prefix, f'{date.year}.{date.month:02}.{date.day:02}'])
 
 
 def format_backup_size(backup_size):
@@ -26,23 +29,23 @@ def format_backup_size(backup_size):
     return humanize.naturalsize(backup_size, binary=True)
 
 
-def get_backup_prefix_keys(prefix):
+def get_backup_prefix_keys(prefix, file_date_format):
     '''Computes the prefixes that should only match a single backup folder in the S3 bucket.
     Returns tuple containing (backup_today_prefix, backup_yesterday_prefix).
     '''
     today = date.today()
     one_day_ago = today - timedelta(1)
     two_days_ago = today - timedelta(2)
-    backup_one_day_prefix = date_to_prefix(prefix, one_day_ago)
-    backup_two_days_prefix = date_to_prefix(prefix, two_days_ago)
+    backup_one_day_prefix = date_to_prefix(prefix, one_day_ago, file_date_format)
+    backup_two_days_prefix = date_to_prefix(prefix, two_days_ago, file_date_format)
     return backup_one_day_prefix, backup_two_days_prefix
 
 
 class ServerStats(object):
 
-    def __init__(self, s3_client, folder):
+    def __init__(self, s3_client, folder, file_date_format):
         self.backup_folder = folder
-        backup_folders = get_backup_prefix_keys(folder)
+        backup_folders = get_backup_prefix_keys(folder, file_date_format)
         self.last_size = s3_client.get_backup_size(backup_folders[0])
         self.second_last_size = s3_client.get_backup_size(backup_folders[1])
 
