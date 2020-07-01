@@ -23,15 +23,19 @@ def handler(event, context):
     body = json.loads(event['body'])
     bucket_name = body.get('bucket_name')
     backup_folder = body.get('backup_folder')
+    file_date_format = body.get('file_date_format')
 
     if not bucket_name:
         return response_error(f'Missing `bucket_name` variable in POST body, aborting.')
     if not backup_folder:
         return response_error(f'Missing `backup_folder` variable in POST body, aborting.')
 
-    logger.info(f'Performing backup check, folder: {backup_folder}...')
+    if file_date_format:
+        logger.info(f'Performing backup check, folder: {backup_folder}, file_date_format: {file_date_format}')
+    else:
+        logger.info(f'Performing backup check, folder: {backup_folder}...')
     s3 = S3Client(bucket_name)
-    backup_stats = ServerStats(s3, backup_folder)
+    backup_stats = ServerStats(s3, backup_folder, file_date_format)
 
     response_body = backup_stats.json
     response = {
