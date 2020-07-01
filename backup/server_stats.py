@@ -14,10 +14,11 @@ def date_to_prefix(prefix, date, file_date_format):
     '''Converts a date to a S3 prefix of the form: prefix/year.month.day.
     Month and day are prepended with a leading zero if it is only 1 letter long.
     '''
-    if not file_date_format or file_date_format == "":
+    if not file_date_format:
         file_date_format = "%Y.%m.%d"
     
-    return os.path.join("/", prefix, date.strftime(file_date_format))
+    assert os.sep == '/'
+    return os.path.join(prefix, date.strftime(file_date_format))
 
 
 def format_backup_size(backup_size):
