@@ -61,6 +61,9 @@ def test_date_to_prefix(prefix_long):
     assert date_to_prefix(prefix_long, sept182020, "%Y-%m-%d") == os.path.join(
         prefix_long, "2020-09-18"
     )
+    assert date_to_prefix("", sept182020, "a/b/c/%Y-%m-%d") == "a/b/c/2020-09-18"
+    with pytest.raises(ValueError):
+        assert date_to_prefix(None, sept182020, "a/b/c/%Y-%m-%d") == "a/b/c/2020-09-18"
 
 
 def test_get_backup_prefix_keys(bucket_name, prefix_long, mock_obj_key_iterator):
@@ -127,7 +130,7 @@ def test_server_json_generation_missing_current_backup(folder, dirs):
             "last_backup_date": one_day_ago,
             "previous_backup_date": two_days_ago,
         },
-        sort_keys=True
+        sort_keys=True,
     )
     mock_client = mock.Mock()
     mock_client.get_backup_size.side_effect = [0, expected_size2]
@@ -151,7 +154,7 @@ def test_server_json_generation_outside_tolerance(folder, dirs):
             "last_backup_date": one_day_ago,
             "previous_backup_date": two_days_ago,
         },
-        sort_keys=True
+        sort_keys=True,
     )
     mock_client = mock.Mock()
     mock_client.get_backup_size.side_effect = [expected_size1, expected_size2]
@@ -175,7 +178,7 @@ def test_server_json_generation_happy_path(folder, dirs):
             "last_backup_date": one_day_ago,
             "previous_backup_date": two_days_ago,
         },
-        sort_keys=True
+        sort_keys=True,
     )
     mock_client = mock.Mock()
     mock_client.get_backup_size.return_value = expected_size

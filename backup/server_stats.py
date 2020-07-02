@@ -19,7 +19,8 @@ def date_to_prefix(prefix, date, file_date_format):
     """
     if not file_date_format:
         file_date_format = "%Y.%m.%d"
-
+    if prefix is None:
+        raise ValueError("Prefix is not allowed to be None")
     return os.path.join(prefix, date.strftime(file_date_format))
 
 
