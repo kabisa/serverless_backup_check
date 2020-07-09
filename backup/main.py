@@ -2,7 +2,6 @@
 
 import json
 import logging
-from backup.s3_client import S3Client
 from backup.server_stats import ServerStats
 
 
@@ -35,8 +34,7 @@ def handler(event, context):
         )
     else:
         logger.info(f'Performing backup check, folder: {backup_folder or "<empty>"}...')
-    s3 = S3Client(bucket_name)
-    backup_stats = ServerStats(s3, backup_folder, file_date_format)
+    backup_stats = ServerStats(bucket_name, backup_folder, file_date_format)
 
     response_body = backup_stats.json
     response = {"statusCode": 200, "body": response_body}
