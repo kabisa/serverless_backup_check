@@ -20,16 +20,44 @@ Layout of files looks as follows:
 The script then performs the check to see if the backups from today (if available) are same as ones from last time,
 and if they are within tolerance (X% difference per day).
 
-Before deploying the lambda function, environment needs to setup for the lambda.
-This can be done by providing an environment.sh file in the root directory of this repo with the following structure:
-
-```
-export BUCKET_NAME=XXX
-```
-
-BUCKET_NAME must be the name of the bucket that contains the backups.
-
-After this is done, you can deploy with the following command: `make deploy`.
-
 Backup size change limitations are based on the calculations in 
 https://drive.google.com/open?id=1tiQXgoRs9gfTeVeEpIu1l0TDDkTfh4dDDm1Eud0zhxQ
+
+# Deploying
+
+make sure you have access to the AWS acount: `kabisa-backups`
+
+```bash
+aws-vault exec kabisa-backups --
+sls deploy
+```
+
+# Adding more buckets to check
+
+In order to do backup checks we need access to the specific backup bucket.
+In case the bucket is in a different account you need to grant this access both in the account that owns the bucket as well as the `kabisa-backups` account (for the lambda function) itself.
+The access for the execution role of the lambda function on the `kabisa-backups` account side is managed by serverless.yaml. So there you will need to append the last two lines to the policy section of serverless.yaml:
+
+```yaml
+      Resource:
+        - "... other buckets ..."
+        - "arn:aws:s3:::<BUCKET_NAME>"
+        - "arn:aws:s3:::<BUCKET_NAME>/*"
+```
+
+This policy needs to be added to the account that hosts the s3 bucket:
+
+```json
+{
+    "Sid": "AllowBackupCheck",
+    "Effect": "Allow",
+    "Principal": {
+        "AWS": "arn:aws:iam::190384451510:role/serverless-backup-analysis-dev-eu-west-1-lambdaRole"
+    },
+    "Action": "s3:ListBucket",
+    "Resource": [
+        "arn:aws:s3:::<BUCKET_NAME>",
+        "arn:aws:s3:::<BUCKET_NAME>/*"
+    ]
+}
+```
