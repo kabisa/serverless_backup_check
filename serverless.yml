@@ -12,6 +12,8 @@ provider:
         - "arn:aws:s3:::kabisa-backup/*"
         - "arn:aws:s3:::kabisa-backup-archive"
         - "arn:aws:s3:::kabisa-backup-archive/*"
+        - "arn:aws:s3:::dovetail-backup-archive"
+        - "arn:aws:s3:::dovetail-backup-archive/*"
         - "arn:aws:s3:::kabisa-logdna"
         - "arn:aws:s3:::kabisa-logdna/*"
 
