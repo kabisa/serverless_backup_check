@@ -10,7 +10,7 @@ clean:
 	@rm -rf htmlcov
 
 deploy:
-	./deploy.sh
+	sls deploy
 
 .PHONY: test ci clean deploy
 

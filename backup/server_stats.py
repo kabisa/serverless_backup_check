@@ -1,6 +1,8 @@
 import json
 from datetime import date, timedelta
 import humanize
+
+from backup.s3_utils import get_backup_size
 from backup.size_change_monitor import relative_size_change, allowed_size_change
 import os
 
@@ -49,11 +51,12 @@ def get_backup_prefix_keys(prefix, file_date_format):
 
 
 class ServerStats(object):
-    def __init__(self, s3_client, folder, file_date_format=None):
+    def __init__(self, bucket_name, folder, file_date_format=None):
+        self.bucket_name = bucket_name
         self.backup_folder = folder
         backup_folders = get_backup_prefix_keys(folder, file_date_format)
-        self.last_size = s3_client.get_backup_size(backup_folders[0])
-        self.second_last_size = s3_client.get_backup_size(backup_folders[1])
+        self.last_size = get_backup_size(bucket_name, backup_folders[0])
+        self.second_last_size = get_backup_size(bucket_name, backup_folders[1])
 
     @property
     def one_day_ago(self):

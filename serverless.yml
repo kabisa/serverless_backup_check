@@ -7,18 +7,15 @@ provider:
     - Effect: "Allow"
       Action:
         - "s3:ListBucket"
-        - "s3:ListBucketVersions"
-        - "s3:GetObjectAcl"
-        - "s3:GetObjectVersionAcl"
-        - "s3:ListBucketMultipartUploads"
-        - "s3:ListMultipartUploadParts"
-        - "s3:GetObject"
-        - "s3:GetBucketCORS"
-        - "s3:GetBucketLocation"
-        - "s3:GetObjectVersion"
       Resource:
-        - "arn:aws:s3:::${env:BUCKET_NAME}"
-        - "arn:aws:s3:::${env:BUCKET_NAME}/*"
+        - "arn:aws:s3:::kabisa-backup"
+        - "arn:aws:s3:::kabisa-backup/*"
+        - "arn:aws:s3:::kabisa-backup-archive"
+        - "arn:aws:s3:::kabisa-backup-archive/*"
+        - "arn:aws:s3:::dovetail-backup-archive"
+        - "arn:aws:s3:::dovetail-backup-archive/*"
+        - "arn:aws:s3:::kabisa-logdna"
+        - "arn:aws:s3:::kabisa-logdna/*"
 
 plugins:
   - serverless-python-requirements

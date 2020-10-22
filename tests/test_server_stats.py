@@ -4,8 +4,10 @@ import pytest
 import datetime
 import json
 import unittest.mock as mock
-import backup.s3_client as s3_client
-from backup.server_stats import ServerStats, within_tolerance
+
+from backup import s3_utils
+import backup.server_stats
+from backup.server_stats import ServerStats
 from backup.server_stats import (
     format_backup_size,
     get_backup_prefix_keys,
@@ -38,11 +40,18 @@ def good_key():
     return "good_key"
 
 
+def get_mock_s3_obj(key, size=0):
+    s3_obj = mock.Mock()
+    s3_obj.key = key
+    s3_obj.size = size
+    return s3_obj
+
+
 @pytest.fixture
-def mock_obj_key_iterator(good_key):
-    s3_client.obj_key_iterator = mock.Mock()
-    s3_client.obj_key_iterator.return_value = [good_key]
-    return s3_client.obj_key_iterator
+def mock_obj_iterator(good_key):
+    s3_utils.iterate_objects = mock.Mock()
+    s3_utils.iterate_objects.return_value = [get_mock_s3_obj(good_key)]
+    return s3_utils.iterate_objects
 
 
 def test_date_to_prefix(prefix_long):
@@ -66,7 +75,7 @@ def test_date_to_prefix(prefix_long):
         assert date_to_prefix(None, sept182020, "a/b/c/%Y-%m-%d") == "a/b/c/2020-09-18"
 
 
-def test_get_backup_prefix_keys(bucket_name, prefix_long, mock_obj_key_iterator):
+def test_get_backup_prefix_keys(bucket_name, prefix_long, mock_obj_iterator):
     today = datetime.datetime.today()
     one_day_ago = today - datetime.timedelta(days=1)
     two_days_ago = today - datetime.timedelta(days=2)
@@ -75,7 +84,7 @@ def test_get_backup_prefix_keys(bucket_name, prefix_long, mock_obj_key_iterator)
         date_to_prefix(prefix_long, key1, None),
         date_to_prefix(prefix_long, key2, None),
     )
-    mock_obj_key_iterator.return_value = [full_path1, full_path2]
+    mock_obj_iterator.return_value = [full_path1, full_path2]
     assert get_backup_prefix_keys(prefix_long, None) == (full_path1, full_path2)
 
 
@@ -108,9 +117,9 @@ def test_server_json_generation_missing_previous_backup(folder, dirs):
         },
         sort_keys=True,
     )
-    mock_client = mock.Mock()
-    mock_client.get_backup_size.side_effect = [expected_size1, 0]
-    stats = ServerStats(mock_client, folder)
+    backup.server_stats.get_backup_size = mock.Mock()
+    backup.server_stats.get_backup_size.side_effect = [expected_size1, 0]
+    stats = ServerStats('some-bucket', folder)
 
     assert stats.last_size == expected_size1
     assert stats.second_last_size == 0
@@ -132,9 +141,9 @@ def test_server_json_generation_missing_current_backup(folder, dirs):
         },
         sort_keys=True,
     )
-    mock_client = mock.Mock()
-    mock_client.get_backup_size.side_effect = [0, expected_size2]
-    stats = ServerStats(mock_client, folder)
+    backup.server_stats.get_backup_size = mock.Mock()
+    backup.server_stats.get_backup_size.side_effect = [0, expected_size2]
+    stats = ServerStats('some-bucket', folder)
 
     assert stats.last_size == 0
     assert stats.second_last_size == expected_size2
@@ -156,9 +165,8 @@ def test_server_json_generation_outside_tolerance(folder, dirs):
         },
         sort_keys=True,
     )
-    mock_client = mock.Mock()
-    mock_client.get_backup_size.side_effect = [expected_size1, expected_size2]
-    stats = ServerStats(mock_client, folder)
+    backup.server_stats.get_backup_size.side_effect = [expected_size1, expected_size2]
+    stats = ServerStats('some-bucket', folder)
 
     assert stats.last_size == expected_size1
     assert stats.second_last_size == expected_size2
@@ -180,9 +188,9 @@ def test_server_json_generation_happy_path(folder, dirs):
         },
         sort_keys=True,
     )
-    mock_client = mock.Mock()
-    mock_client.get_backup_size.return_value = expected_size
-    stats = ServerStats(mock_client, folder)
+    backup.server_stats.get_backup_size = mock.Mock()
+    backup.server_stats.get_backup_size.return_value = expected_size
+    stats = ServerStats('some-bucket', folder)
 
     assert stats.last_size == expected_size
     assert stats.second_last_size == expected_size
