@@ -61,3 +61,31 @@ This policy needs to be added to the account that hosts the s3 bucket:
     ]
 }
 ```
+
+# Trying the check locally
+
+Requirements:
+
+- `pip install fire` (But the script will notify you if you forgot)
+- `aws-vault exec kabisa-backups` (But the script will notify you if you forgot)
+
+The file `run_local.py` is a [Fire](https://github.com/google/python-fire) script for running this check locally
+Fire helps with nice cli apps. For example if you run `./run_local.py -h` you get this output:
+
+```bash
+NAME
+    run_local.py
+
+SYNOPSIS
+    run_local.py BACKUP_FOLDER <flags>
+
+POSITIONAL ARGUMENTS
+    BACKUP_FOLDER
+
+FLAGS
+    --bucket_name=BUCKET_NAME
+    --file_date_format=FILE_DATE_FORMAT
+
+NOTES
+    You can also use flags syntax for POSITIONAL ARGUMENTS
+```
