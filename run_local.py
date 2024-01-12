@@ -13,13 +13,13 @@ from backup.server_stats import ServerStats
 
 def main(
     backup_folder: str,
-    bucket_name: str = "kabisa-backup-archive",
+    bucket_name: str = "dovetail-backup-archive",
     file_date_format: Optional[str] = None,
 ):
     try:
         backup_stats = ServerStats(bucket_name, backup_folder, file_date_format)
     except (NoCredentialsError, ClientError) as ex:
-        print(f"Boto error: {ex}\r\n" "Plz run `aws-vault exec kabisa-backups` first")
+        print(f"Boto error: {ex}\r\n" "Plz run `aws-vault exec dovetail-backups` first")
     else:
         print(json.dumps(backup_stats.json))
 
