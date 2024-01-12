@@ -1,7 +1,7 @@
 service: serverless-backup-analysis
 provider:
   name: aws
-  runtime: python3.6
+  runtime: python3.11
   region: eu-west-1
   iamRoleStatements:
     - Effect: "Allow"
