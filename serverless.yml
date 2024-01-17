@@ -1,21 +1,15 @@
 service: serverless-backup-analysis
 provider:
   name: aws
-  runtime: python3.6
+  runtime: python3.11
   region: eu-west-1
   iamRoleStatements:
     - Effect: "Allow"
       Action:
         - "s3:ListBucket"
       Resource:
-        - "arn:aws:s3:::kabisa-backup"
-        - "arn:aws:s3:::kabisa-backup/*"
-        - "arn:aws:s3:::kabisa-backup-archive"
-        - "arn:aws:s3:::kabisa-backup-archive/*"
         - "arn:aws:s3:::dovetail-backup-archive"
         - "arn:aws:s3:::dovetail-backup-archive/*"
-        - "arn:aws:s3:::kabisa-logdna"
-        - "arn:aws:s3:::kabisa-logdna/*"
 
 plugins:
   - serverless-python-requirements
